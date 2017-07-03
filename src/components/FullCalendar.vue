@@ -33,7 +33,7 @@
         </div>
         <div class="nav-center">
           <p>
-            <strong @click="changeMonth" v-if="!isChangeMonth">{{moment }}</strong>
+            <strong @click="changeMonth" v-if="!isChangeMonth">{{startDate.add(1,'day').format("MMMM YYYY") }}</strong>
             <select v-else v-model="month" @change="changeMonth">
               <option v-for="m in months" :value="months.indexOf(m)" :key="m">{{m}}</option>
             </select>
