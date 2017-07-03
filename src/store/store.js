@@ -8,6 +8,18 @@ import shortid from "shortid"
 Vue.use(VueAxios, axios)
 Vue.use(Vuex)
 
+export class Reason {
+
+  constructor(code, label) {
+    this.code = code
+    this.label = label
+  }
+
+  render() {
+    return { code: this.code, label: this.label }
+  }
+}
+
 export class City {
   constructor(location) {
     this.location = location
@@ -62,7 +74,16 @@ const state = {
   cities: [],
   sortingBy: '',
   sortAsc: true,
-  isActive : false
+  isActive: false,
+  reasons: [
+    new Reason('F', 'Formation').render(),
+    new Reason('I', 'Intercontrat').render(),
+    new Reason('CP', 'Congé payé').render(),
+    new Reason('CSS', 'Congé sans solde').render(),
+    new Reason('M', 'Maladie').render(),
+    new Reason('ABS', 'Absence exceptionnelle payée').render(),
+    new Reason('RTTE', 'RTT Employeur').render(),
+    new Reason('RTTS', 'RTT Salarié').render()]
 }
 
 const mutations = {
@@ -104,8 +125,11 @@ const mutations = {
 }
 
 const actions = {
-  toggleModal: ({ commit, state}) => {
+  toggleModal: ({ commit, state }) => {
     commit("toggleActive")
+  },
+  validateReason: ({ commit, state }) => {
+
   },
   removeCity: ({ commit, state, dispatch }, id) => {
     commit("removeCity", id)
@@ -160,6 +184,7 @@ const actions = {
 }
 
 const getters = {
+  reasons: (state) => state.reasons.sort((a, b) => a.code > b.code),
   validCities: (state) => state.cities.filter(city => !city.hasError && city.hasWeather()),
   noCitiesHaveLocation: (state) => { return !state.cities.some(city => city.location.length != 0) }
 }

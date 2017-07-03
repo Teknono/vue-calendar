@@ -185,7 +185,6 @@ export default {
         el.classList.add("tag")
         el.classList.add("is-primary")
         el.innerHTML += " " + holiday.name
-        el.style = {margin:0}
       })
     },
     customizeWeekEnd() {

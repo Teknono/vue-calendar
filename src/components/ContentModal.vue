@@ -21,7 +21,7 @@
             </button>
           </p>
           <p class="control">
-            <button class="button is-primary">
+            <button @click="validate" class="button is-primary">
               Valider
             </button>
           </p>
@@ -31,38 +31,19 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
-
-class Reason {
-
-  constructor(code, label) {
-    this.code = code
-    this.label = label
-  }
-
-  render() {
-    return { code: this.code, label: this.label }
-  }
-}
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: "ContentModal",
-  data() {
-    return {
-      reasons: [
-        new Reason('F', 'Formation').render(),
-        new Reason('I', 'Intercontrat').render(),
-        new Reason('CP', 'Congé payé').render(),
-        new Reason('CSS', 'Congé sans solde').render(),
-        new Reason('M', 'Maladie').render(),
-        new Reason('ABS', 'Absence exceptionnelle payée').render(),
-        new Reason('RTTE', 'RTT Employeur').render(),
-        new Reason('RTTS', 'RTT Salarié').render()].sort((a, b) => a.code > b.code)
-    }
+  computed: {
+    ...mapGetters(['reasons'])
   },
   methods: {
     close() {
       this.$store.commit('toggleModal')
+    },
+    validate() {
+      this.$store.commit('validateReason')
     }
   }
 }
