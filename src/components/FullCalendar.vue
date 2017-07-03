@@ -33,7 +33,7 @@
         </div>
         <div class="nav-center">
           <p>
-            <strong @click="changeMonth" v-if="!isChangeMonth">{{startDate.add(1,'day').format("MMMM YYYY") }}</strong>
+            <strong @click="changeMonth" v-if="!isChangeMonth">{{displayMonth }}</strong>
             <select v-else v-model="month" @change="changeMonth">
               <option v-for="m in months" :value="months.indexOf(m)" :key="m">{{m}}</option>
             </select>
@@ -64,6 +64,7 @@ import moment from 'moment'
 import LayoutModal from './LayoutModal'
 import ContentModal  from './ContentModal'
 import Cell from '../utils/Cell.js'
+import Event from './Event'
 
 var locale = window.navigator.userLanguage || window.navigator.language;
 if (locale)
@@ -95,7 +96,7 @@ export default {
     // })
   },
   components: {
-    LayoutModal, ContentModal
+    LayoutModal, ContentModal,Event
   },
   data() {
     return {
@@ -120,6 +121,9 @@ export default {
     }
   },
   computed: {
+    displayMonth() {
+      return moment(this.moment).add(1,'day').format('MMMM YYYY')
+    },
     moment() {
       return moment([this.year, this.month])
     },
@@ -185,6 +189,7 @@ export default {
         el.classList.add("tag")
         el.classList.add("is-primary")
         el.innerHTML += " " + holiday.name
+        el.style.margin = 0
       })
     },
     customizeWeekEnd() {
@@ -209,6 +214,14 @@ export default {
       span.innerHTML = innerHtml
       return span
     },
+    createEventElement(event) {
+      const span = document.createElement("span")
+      span.classList.add(["event", "tag"])
+      const deleteButton = document.createElement("button")
+      deleteButton.classList.add(["delete","is-small"])
+      span.innerHTML = event
+      span.appendChild(deleteButton)
+    },
     clearCalendar() {
       document.querySelectorAll("span.calendar-number-out, span.calendar-number").forEach(span => {
         span.parentNode.removeChild(span)
@@ -216,7 +229,7 @@ export default {
       this.clearHolidays()
     },
     today() {
-      this.month = new Date().getMonth()
+      this.month = moment().month()
       this.year = moment().year()
       this.holidays = new Cell(new Date()).holidays()
     },
@@ -311,11 +324,20 @@ span {
         width: 100%;
         text-align: right;
         box-sizing: border-box;
+        float : left;
       }
 
       .calendar-number-out {
         @extend .calendar-number;
         color: $day-out;
+      }
+
+      .event {
+        @extend .calendar-number;
+        text-align: center;
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-top: 15px;
       }
 
       &:hover {
