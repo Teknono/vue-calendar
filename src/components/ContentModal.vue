@@ -3,7 +3,7 @@
     <div class="field">
       <p class="control has-icons-left">
         <span class="select is-fullwidth">
-          <select>
+          <select v-model="selected">
             <option v-for="reason in reasons" :key="reason.code" :value="reason.code">{{reason.label}}</option>
           </select>
         </span>
@@ -35,6 +35,11 @@ import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: "ContentModal",
+  data() {
+    return {
+      selected : ""
+    }
+  },
   computed: {
     ...mapGetters(['reasons'])
   },
@@ -43,7 +48,9 @@ export default {
       this.$store.commit('toggleModal')
     },
     validate() {
-      this.$store.commit('validateReason')
+      this.$store.dispatch('addEvent', this.selected)
+      this.selected = ""
+      this.close()
     }
   }
 }

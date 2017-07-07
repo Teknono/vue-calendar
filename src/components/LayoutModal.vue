@@ -1,11 +1,17 @@
 <template>
-  <div class="modal" :class="{'is-active' : isActive}">
-    <div @click="close" class="modal-background"></div>
-    <div class="modal-content">
-      <slot></slot>
+   <transition
+    name="custom-classes-transition"
+    enter-active-class="animated tada"
+    leave-active-class="animated bounceOutRight"
+  >
+    <div class="modal" :class="{'is-active' : isActive}">
+      <div @click="close" class="modal-background"></div>
+      <div class="modal-content">
+        <slot></slot>
+      </div>
+      <button @click="close" class="modal-close"></button>
     </div>
-    <button @click="close" class="modal-close"></button>
-  </div>
+  </transition>
 </template>
 
 <script>

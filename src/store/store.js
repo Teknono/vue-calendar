@@ -1,8 +1,10 @@
+import Cell from '../utils/Cell.js'
 import Vue from 'vue'
 import VueAxios from "vue-axios"
 import Vuex from 'vuex'
 import axios from "axios"
 import countries from "../assets/country_codes"
+import moment from 'moment'
 import shortid from "shortid"
 
 Vue.use(VueAxios, axios)
@@ -75,6 +77,7 @@ const state = {
   sortingBy: '',
   sortAsc: true,
   isActive: false,
+  selectedDate: '',
   reasons: [
     new Reason('F', 'Formation').render(),
     new Reason('I', 'Intercontrat').render(),
@@ -83,11 +86,19 @@ const state = {
     new Reason('M', 'Maladie').render(),
     new Reason('ABS', 'Absence exceptionnelle payée').render(),
     new Reason('RTTE', 'RTT Employeur').render(),
-    new Reason('RTTS', 'RTT Salarié').render()]
+    new Reason('RTTS', 'RTT Salarié').render()],
+  events: [
+    { id: shortid.generate(), date: new Date(), cell: new Cell(new Date()).render(), name: "Test" },
+    { id: shortid.generate(), date: new Date(2018, 1, 25), cell: new Cell(new Date(2018, 1, 25)).render(), name: "Necci" }
+  ]
 }
 
 const mutations = {
   toggleModal: (state) => state.isActive = !state.isActive,
+
+  removeEvent: (state, id) => state.events = state.events.filter(event => event.id != id),
+
+  addEvent: (state, reason) => state.events.push({ id: shortid.generate(), date : state.selectedDate, cell: new Cell(state.selectedDate).render(), name: reason }),
 
   addCity: (state, location = "") => state.cities.push(new City(location)),
 
@@ -125,9 +136,32 @@ const mutations = {
 }
 
 const actions = {
-  toggleModal: ({ commit, state }) => {
-    commit("toggleActive")
+  toggleModal: ({ commit, state }, date) => {
+    commit("toggleModal")
+    state.selectedDate = date
   },
+
+  addEvent:({commit,state, dispatch}, payload) => {
+    commit("addEvent", payload)
+    dispatch("saveEvents")
+  },
+
+  removeEvent: ({commit, state, dispatch}, id) => {
+    commit("removeEvent", id)
+    dispatch("saveEvents")
+  },
+
+  loadEvents: ({state}) => {
+    let storedEvents = localStorage.getItem('events')
+    if(storedEvents) {
+      storedEvents = JSON.parse(storedEvents)
+    }
+  },
+
+  saveEvents:({state}) => {
+    localStorage.setItem('events', JSON.stringify(state.events))
+  },
+
   validateReason: ({ commit, state }) => {
 
   },

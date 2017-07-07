@@ -33,10 +33,12 @@
         </div>
         <div class="nav-center">
           <p>
-            <strong @click="changeMonth" v-if="!isChangeMonth">{{displayMonth }}</strong>
-            <select v-else v-model="month" @change="changeMonth">
-              <option v-for="m in months" :value="months.indexOf(m)" :key="m">{{m}}</option>
-            </select>
+            <transition enter-active-class="animated zoomIn" leave-active-class="animated zoomOut" mode="out-in">
+              <strong @click="changeMonth" v-if="!isChangeMonth">{{displayMonth }}</strong>
+              <select v-else v-model="month" @change="changeMonth">
+                <option v-for="(m, index) in months" :value="index" :key="m">{{m}}</option>
+              </select>
+            </transition>
             <!--<input type="number"  id="changeMonth" @keyup.enter="changeMonth" @keyup.tab="changeMonth"  v-model="month">-->
           </p>
         </div>
@@ -48,9 +50,16 @@
       <div class="header">
         <div v-for="day in days" :key="day" class=days>{{day}}</div>
       </div>
+
       <div class="week" v-for="n in 6" :key="n">
-        <div class="day" v-for="d in 7" :key="d" @click="openEvent"></div>
+        <div class="day" v-for="d in 7" :key="d" @click="openEvent">
+          <span class="tag" v-for="event in cellEvents(n,d)" :key="event.id">{{event.name}}
+            <button class="delete is-small" @click.stop="removeEvent(event.id)"></button>
+          </span>
+
+        </div>
       </div>
+
     </div>
     <LayoutModal>
       <ContentModal></ContentModal>
@@ -60,11 +69,13 @@
 
 <script>
 require("normalize-css")
+require("animate.css")
 import moment from 'moment'
+import shortId from 'shortid'
 import LayoutModal from './LayoutModal'
-import ContentModal  from './ContentModal'
+import ContentModal from './ContentModal'
 import Cell from '../utils/Cell.js'
-import Event from './Event'
+import { mapState } from 'vuex'
 
 var locale = window.navigator.userLanguage || window.navigator.language;
 if (locale)
@@ -96,7 +107,7 @@ export default {
     // })
   },
   components: {
-    LayoutModal, ContentModal,Event
+    LayoutModal, ContentModal
   },
   data() {
     return {
@@ -121,8 +132,11 @@ export default {
     }
   },
   computed: {
+    ...mapState([
+      'events'
+    ]),
     displayMonth() {
-      return moment(this.moment).add(1,'day').format('MMMM YYYY')
+      return moment(this.moment).add(1, 'day').format('MMMM YYYY')
     },
     moment() {
       return moment([this.year, this.month])
@@ -153,6 +167,15 @@ export default {
     }
   },
   methods: {
+    cellEvents(week, day) {
+      return this.events.filter(event => {
+        return event.cell.day === day &&
+          event.cell.week === week &&
+          moment(event.date).month() === this.month &&
+          moment(event.date).year() === this.year
+      })
+    },
+
     fillMonthCalendar() {
       for (let day = 0; day < this.getDayInCurrentMonth; day++) {
         const index = day + this.getFirstCell.day - 1
@@ -218,7 +241,7 @@ export default {
       const span = document.createElement("span")
       span.classList.add(["event", "tag"])
       const deleteButton = document.createElement("button")
-      deleteButton.classList.add(["delete","is-small"])
+      deleteButton.classList.add(["delete", "is-small"])
       span.innerHTML = event
       span.appendChild(deleteButton)
     },
@@ -254,8 +277,11 @@ export default {
     changeMonth() {
       this.isChangeMonth = !this.isChangeMonth
     },
-    openEvent() {
-      this.$store.commit('toggleModal')
+    openEvent(event) {
+      this.$store.dispatch('toggleModal', new Date(this.year, this.month, event.target.innerText))
+    },
+    removeEvent(id) {
+      this.$store.dispatch("removeEvent", id)
     }
   }
 }
@@ -307,7 +333,7 @@ span {
 
     .day {
       flex: 1;
-      display: flex;
+      display: block;
       text-align: center;
       min-height: 109px;
       border-style: solid;
@@ -320,11 +346,11 @@ span {
 
       .calendar-number {
         font-size: 0.9em;
-        margin-right: 5px;
+        padding-right: 5px;
         width: 100%;
         text-align: right;
         box-sizing: border-box;
-        float : left;
+        float: left;
       }
 
       .calendar-number-out {
