@@ -2,7 +2,8 @@
   <div class="card">
     <div class="card-image">
       <figure class="image is-4by3">
-        <img :src="people.image[4]['#text']" alt="">
+        <!-- <img :src="people.image[4]['#text']" alt=""> -->
+        <vue-lazy-img :source="people.image[4]['#text']" placeholder="https://dummyimage.com/600x400/000/fff"></vue-lazy-img>
       </figure>
     </div>
 
@@ -26,10 +27,14 @@
 </template>
 
 <script>
+import VueLazyImg from 'vue-lazy-img';
 var numeral = require('numeral')
 
 export default {
   props: ["people"],
+  components: {
+    VueLazyImg
+  },
   methods: {
     numeral(value) {
       return numeral(value).format('0,0')

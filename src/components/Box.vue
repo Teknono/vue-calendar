@@ -6,7 +6,7 @@
             <img :src="people.image[2]['#text']" alt="">
           </figure>
         </div>
-        <div class="media-content">
+        <div class="media-content is-hidden-mobile">
           <div class="content">
             <p>
               <strong>{{people.name}}</strong>
