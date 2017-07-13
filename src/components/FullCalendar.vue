@@ -278,7 +278,8 @@ export default {
       this.isChangeMonth = !this.isChangeMonth
     },
     openEvent(event) {
-      this.$store.dispatch('toggleModal', new Date(this.year, this.month, event.target.innerText))
+      if(event.target.querySelector('span.calendar-number-out') !== undefined)
+        this.$store.dispatch('toggleModal', new Date(this.year, this.month, event.target.innerText))
     },
     removeEvent(id) {
       this.$store.dispatch("removeEvent", id)
