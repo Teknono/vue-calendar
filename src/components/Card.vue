@@ -2,8 +2,7 @@
   <div class="card">
     <div class="card-image">
       <figure class="image is-4by3">
-        <!-- <img :src="people.image[4]['#text']" alt=""> -->
-        <vue-lazy-img :source="people.image[4]['#text']" placeholder="https://dummyimage.com/600x400/000/fff"></vue-lazy-img>
+        <vue-lazy-img :source="people.image[4]['#text']" placeholder=""></vue-lazy-img>
       </figure>
     </div>
 
@@ -16,7 +15,9 @@
         </div>
         <div class="media-content">
           <p class="title is-4">{{people.name}}</p>
-          <p class="subtitle is-6">{{numeral(people.playcount)}}</p>
+          <p class="subtitle is-6">Playcount : {{people.playcount}}</p>
+          <!--<p class="subtitle is-6" v-for="(attribute, index) in Object.keys(people)" :key="index">{{attribute}} : {{people[attribute]}}</p>-->
+
         </div>
       </div>
     </div>

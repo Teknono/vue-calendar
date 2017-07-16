@@ -1,6 +1,7 @@
+import Detail from '@/components/Detail'
 import FullCalendar from '@/components/FullCalendar'
 import Gmap from '@/components/Gmap'
-import Hello from '@/components/Hello'
+import LastFm from '@/components/LastFm'
 import Layout from '@/Layout/Layout'
 import Router from 'vue-router'
 import Vue from 'vue'
@@ -8,11 +9,13 @@ import Vue from 'vue'
 Vue.use(Router)
 
 export default new Router({
+  linkExactActiveClass : 'is-active',
+  mode : 'history',
   routes: [
     {
       path: '/',
       name: 'Hello',
-      component: Hello
+      component: LastFm
     },
     {
       path: '/Netatmo',
@@ -28,6 +31,11 @@ export default new Router({
       path: '/Calendar',
       name: 'Calendar',
       component : FullCalendar
+    },
+    {
+      path: '/Detail/:id',
+      name: 'Detail',
+      component: Detail
     }
   ]
 })
