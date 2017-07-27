@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-image">
       <figure class="image is-4by3">
-        <vue-lazy-img :source="people.image[4]['#text']" placeholder=""></vue-lazy-img>
+        <vue-lazy-img :source="image()" placeholder=""></vue-lazy-img>
       </figure>
     </div>
 
@@ -10,7 +10,7 @@
       <div class="media">
         <div class="media-left">
           <figure class="image is-48x48">
-            <img :src="people.image[0]['#text']" alt="">
+            <img :src="image(0)" alt="">
           </figure>
         </div>
         <div class="media-content">
@@ -39,6 +39,11 @@ export default {
   methods: {
     numeral(value) {
       return numeral(value).format('0,0')
+    }
+  },
+  methods: {
+    image(size = 4) {
+      return this.people.image[size]["#text"]
     }
   }
 }

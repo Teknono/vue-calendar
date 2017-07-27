@@ -1,5 +1,5 @@
 <template>
-  <section class="section">
+  <section class="section" v-cloak>
     <nav class="breadcrumb">
       <ul>
         <li>
@@ -15,7 +15,7 @@
     <article class="media">
       <figure class="media-left">
         <p class="image is-128x128">
-          <img :src="artist.image[2]['#text']">
+          <img :src="image">
         </p>
         <hr>
         <p>
@@ -45,6 +45,7 @@
 
 <script>
 import { numberWithCommas } from '../utils'
+import { db } from '../utils/firebase'
 
 export default {
   created() {
@@ -55,18 +56,29 @@ export default {
       artist: {}
     }
   },
-  watch: {
-    '$route': 'findArtist'
-  },
+  // firebase: {
+  //   artistRef: db.ref('people')
+  // },
+  // watch: {
+  //   '$route': 'findArtist'
+  // },
   computed: {
     onTour() {
+      console.log('ontour', this.artist)
       return {
-        'is-success' : this.artist.ontour === "1",
-        'is-danger' : this.artist.ontour !== "1"
+        'is-success': this.artist.ontour === "1",
+        'is-danger': this.artist.ontour !== "1"
       }
-    }
+    },
+    image: {
+      get() {
+        console.log(this.artist)
+        return '' //Object.values(this.artist.image[2])[0]
+      }
+    },
   },
   methods: {
+
     format(value) {
       return numberWithCommas(value)
     },
@@ -75,7 +87,11 @@ export default {
       const mbid = decodeURIComponent(this.$route.params.id)
       const apiLastFm = `http://ws.audioscrobbler.com/2.0/?method=${method}&artist=${mbid}&api_key=dad46f2867c8fbc2a0bd6e78a09805af&format=json`
       this.$http.get(apiLastFm)
-        .then(response => { this.artist = response.data.artist })
+        .then(response => {
+          console.log('artist => ', response.data.artist)
+          this.artist = response.data.artist
+          this.$firebaseRefs.artistRef.child(response.data.artist.name).update({ content: response.data.artist.bio.content })
+        })
         .catch(response => console.error(response))
     }
   }

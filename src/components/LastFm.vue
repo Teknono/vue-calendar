@@ -5,8 +5,14 @@
         <p class="control">
           <a @click="isActive = !isActive" class="button">Affichage</a>
         </p>
+        <p class="control">
+        </p>
       </div>
     </div>
+    <loading-top :show="isLoading"></loading-top>
+    <section class="section" v-if="networkError">
+      <p>Sorry, there was an error getting artists</p>
+    </section>
     <section class="section" v-show="people.length > 0">
       <div class="container">
         <div class="columns field is-grouped-centered">
@@ -21,7 +27,7 @@
         </div>
       </div>
       <hr>
-      <transition-group name="swapi" tag="div" class="columns is-multiline is-mobile">
+      <transition-group name="swapi" tag="div" class="columns is-multiline is-mobile" appear>
         <div class="column is-12-desktop is-one-third-tablet is-one-quarter-mobile" :class="{'is-one-third' : isActive}" v-for="(p, index) in paginatePeople" :key="index">
           <a @click="goto(index)" v-if="people[index].name">
             <box :people="p" v-if="!isActive"></box>
@@ -36,15 +42,26 @@
 
 <script>
 
-import Vue from "vue"
+
 import box from './Box'
 import card from './Card'
 import pagination from './Pagination'
+import loadingTop from './Loading'
 import router from '../router'
+import { db } from '../utils/firebase'
+import Vue from "vue"
+import VueFire from 'vuefire'
+
+Vue.use(VueFire)
+
+var peopleRef = db.ref('people')
 
 export default {
   mounted() {
     this.fetchPeople()
+  },
+  firebase: {
+    artists: peopleRef
   },
   data() {
     return {
@@ -54,10 +71,14 @@ export default {
       sortBy: "",
       itemPerPage: 10,
       currentPage: 1,
-      artist: {}
+      artist: {},
+      networkError: false,
+      isLoading: false,
+
     }
   },
   computed: {
+
     attributes() {
       if (this.people.length > 0)
         return Object.keys(this.people[0])
@@ -68,11 +89,11 @@ export default {
     }
   },
   components: {
-    box, card, pagination
+    box, card, pagination, loadingTop
   },
   methods: {
     goto(index) {
-      router.push({name : "Detail", params: {id : this.people[index].name}})
+      router.push({ name: "Detail", params: { id: this.people[index].name } })
     },
     updateCurrentPage(payload) {
       this.currentPage = payload
@@ -113,20 +134,27 @@ export default {
       })
     },
     fetchPeople() {
+      this.isLoading = true
       const api = `http://swapi.co/api/people/`
       const apiLastFm = 'http://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=dad46f2867c8fbc2a0bd6e78a09805af&format=json'
       this.$http.get(apiLastFm/*'http://api.brewerydb.com/v2/?key=0670efb6e5ec64a924718a98a988b026'*/)
-        .then(response => { this.people = response.data.artists.artist })
-        .catch(response => { console.log(response) })
-    },
-    findArtist(mbid) {
-      const method = "artist.getinfo"
-      const apiLastFm = `http://ws.audioscrobbler.com/2.0/?method=${method}&artist=${mbid}&api_key=dad46f2867c8fbc2a0bd6e78a09805af&format=json`
-      this.$http.get(apiLastFm)
-        .then(response => { console.log(response); this.artist = response.data.artist })
-        .catch(response => console.error(response))
+        .then(response => {
+          this.people = response.data.artists.artist;
+          this.isLoading = false
+        })
+        .then(() => {
+          this.people.forEach((p, index) => {
+            let pref = Object.assign({}, p)
+            delete pref.image
+            peopleRef.child(p.name).set(pref)
+          })
+        })
+        .catch(response => {
+          console.log(response);
+          this.networkError = true;
+          this.isLoading = false
+        })
     }
-
   }
 }
 </script>

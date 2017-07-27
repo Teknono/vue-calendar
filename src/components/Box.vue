@@ -3,7 +3,7 @@
       <article class="media">
         <div class="media-left">
           <figure class="image is-128x128">
-            <img :src="people.image[2]['#text']" alt="">
+            <img :src="image" alt="">
           </figure>
         </div>
         <div class="media-content is-hidden-mobile">
@@ -25,6 +25,11 @@ export default {
   name: "box",
   data() {
     return {}
+  },
+  computed: {
+    image() {
+      return this.people.image[2]['#text']
+    }
   }
 
 }
