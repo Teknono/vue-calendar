@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import firebase from 'firebase'
 
 const firebaseApp = firebase.initializeApp({
@@ -10,3 +11,21 @@ const firebaseApp = firebase.initializeApp({
 })
 
 export const db = firebaseApp.database()
+
+export const peopleRef = db.ref('people')
+
+export const mixinFirebase = {
+  mounted() {
+    console.log('mixin chargé')
+  },
+  firebase() {
+    return {
+      ref: db.ref('people')
+    }
+  },
+  methods: {
+    remove(child) {
+      this.$firebaseRefs.ref.child(child).remove()
+    }
+  }
+}

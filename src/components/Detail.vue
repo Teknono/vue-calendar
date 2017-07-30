@@ -45,7 +45,7 @@
 
 <script>
 import { numberWithCommas } from '../utils'
-import { db } from '../utils/firebase'
+import { db, peopleRef } from '../utils/firebase'
 
 export default {
   created() {
@@ -56,25 +56,23 @@ export default {
       artist: {}
     }
   },
-  // firebase: {
-  //   artistRef: db.ref('people')
-  // },
+  firebase() {
+    return {
+      artistRef: peopleRef
+    }
+  },
   // watch: {
   //   '$route': 'findArtist'
   // },
   computed: {
     onTour() {
-      console.log('ontour', this.artist)
       return {
         'is-success': this.artist.ontour === "1",
         'is-danger': this.artist.ontour !== "1"
       }
     },
-    image: {
-      get() {
-        console.log(this.artist)
-        return '' //Object.values(this.artist.image[2])[0]
-      }
+    image() {
+      return this.artist.image[2]['#text']
     },
   },
   methods: {
@@ -88,7 +86,6 @@ export default {
       const apiLastFm = `http://ws.audioscrobbler.com/2.0/?method=${method}&artist=${mbid}&api_key=dad46f2867c8fbc2a0bd6e78a09805af&format=json`
       this.$http.get(apiLastFm)
         .then(response => {
-          console.log('artist => ', response.data.artist)
           this.artist = response.data.artist
           this.$firebaseRefs.artistRef.child(response.data.artist.name).update({ content: response.data.artist.bio.content })
         })

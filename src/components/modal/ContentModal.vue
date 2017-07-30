@@ -34,7 +34,6 @@
 import { mapState, mapGetters } from 'vuex'
 
 export default {
-  name: "ContentModal",
   data() {
     return {
       selected : ""

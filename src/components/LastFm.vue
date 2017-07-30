@@ -43,18 +43,12 @@
 <script>
 
 
-import box from './Box'
-import card from './Card'
+import box from './lastFm/Box'
+import card from './lastFm/Card'
 import pagination from './Pagination'
-import loadingTop from './Loading'
-import router from '../router'
-import { db } from '../utils/firebase'
-import Vue from "vue"
-import VueFire from 'vuefire'
-
-Vue.use(VueFire)
-
-var peopleRef = db.ref('people')
+import loadingTop from './lastFm/Loading'
+import router from '@/router'
+import { db, peopleRef } from '@/utils/firebase'
 
 export default {
   mounted() {
@@ -69,7 +63,7 @@ export default {
       isActive: false,
       sortAsc: true,
       sortBy: "",
-      itemPerPage: 10,
+      itemPerPage: 9,
       currentPage: 1,
       artist: {},
       networkError: false,
@@ -95,6 +89,7 @@ export default {
     goto(index) {
       router.push({ name: "Detail", params: { id: this.people[index].name } })
     },
+
     updateCurrentPage(payload) {
       this.currentPage = payload
     },
@@ -133,6 +128,7 @@ export default {
         }
       })
     },
+
     fetchPeople() {
       this.isLoading = true
       const api = `http://swapi.co/api/people/`

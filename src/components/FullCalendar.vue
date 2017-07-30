@@ -72,9 +72,9 @@ require("normalize-css")
 require("animate.css")
 import moment from 'moment'
 import shortId from 'shortid'
-import LayoutModal from './LayoutModal'
-import ContentModal from './ContentModal'
-import Cell from '../utils/Cell.js'
+import LayoutModal from './modal/LayoutModal'
+import ContentModal from './modal/ContentModal'
+import Cell from '@/utils/Cell.js'
 import { mapState } from 'vuex'
 
 var locale = window.navigator.userLanguage || window.navigator.language;

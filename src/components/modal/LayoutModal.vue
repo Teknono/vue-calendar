@@ -18,7 +18,6 @@
 import { mapState } from 'vuex'
 
 export default {
-  name: "LayoutModal",
   created() {
     const that = this
     document.addEventListener("keydown", e => {

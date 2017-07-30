@@ -4,7 +4,7 @@
       <table class="table" v-if="artists.length > 0">
         <thead>
           <tr>
-            <th v-for="(header,index) in Object.keys(artists[0])" :key="index">{{header}}</th>
+            <th v-for="(header,index) in Object.keys(artists[0])" :class="{'asc' : sortAsc, 'desc' : !sortAsc, 'is-active' : header === sortBy}" :key="index" @click="sort(header)">{{header}}</th>
             <th>Supprimer</th>
           </tr>
         </thead>
@@ -18,51 +18,61 @@
           </tr>
         </tbody>
       </table>
-      <!--<pagination :totalItems="artists" :itemPerPages="itemPerPage" @changepage="updateCurrentPage"></pagination>-->
     </div>
   </section>
 </template>
 
 <script>
-import Vue from 'vue'
-import pagination from './Pagination'
+import { db } from '@/utils/firebase'
+import orderBy from 'lodash.orderby'
 
-import { db } from '../utils/firebase'
-
-import VueFire from 'vuefire'
-Vue.use(VueFire)
-var artistRef = db.ref('people')
 export default {
+  created() {
+    this.onAdded()
+  },
   firebase() {
     return {
-      artists: artistRef
+      ref: db.ref('people')
     }
   },
   data() {
     return {
-      itemPerPage: 10,
-      currentPage: 0
-    }
-  },
-  components: {
-    pagination
-  },
-  computed: {
-    paginateArtist() {
-      // const artistsclone = {...artistRef}
-      // return artistsclone.slice((this.currentPage - 1) * this.itemPerPage, this.currentPage * this.itemPerPage)
+      sortBy: '',
+      sortAsc: true,
+      artists: []
     }
   },
   methods: {
-    remove(child) {
-      this.$firebaseRefs.artists.child(child).remove()
+    onAdded() {
+      var self = this
+      this.$firebaseRefs.ref.on('child_added', snapshot => {
+        self.artists.push(snapshot.val())
+      })
     },
-    updateCurrentPage() {
+    remove(child) {
+      this.$firebaseRefs.ref.child(child).remove()
+    },
+    sort(attribute) {
+      if (this.sortBy === attribute) {
+        this.sortAsc = !this.sortAsc
+      } else {
+        this.sortBy = attribute
+        this.sortAsc = true
+      }
+      this.artists = orderBy(this.artists,[attribute],[this.sortAsc ? 'asc' : 'desc'])
 
     }
   }
-
-
 }
 </script>
+
+<style>
+.is-active.asc::after {
+  content: "▼"
+}
+
+.is-active.desc::after {
+  content: "▲"
+}
+</style>
 
