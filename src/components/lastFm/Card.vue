@@ -15,30 +15,34 @@
         </div>
         <div class="media-content">
           <p class="title is-4">{{people.name}}</p>
-          <p class="subtitle is-6">Playcount : {{people.playcount}}</p>
+          <p class="subtitle is-6">Playcount : {{people.playcount | numberWithCommas}}</p>
           <!--<p class="subtitle is-6" v-for="(attribute, index) in Object.keys(people)" :key="index">{{attribute}} : {{people[attribute]}}</p>-->
 
         </div>
       </div>
     </div>
     <footer class="card-footer">
-      <p class="card-footer-item"><span>View on <a :href="people.url">{{people.url}}</a></span></p>
+      <p class="card-footer-item">
+        <span>View on
+          <a :href="people.url">{{people.url}}</a>
+        </span>
+      </p>
     </footer>
   </div>
 </template>
 
 <script>
 import VueLazyImg from 'vue-lazy-img';
-var numeral = require('numeral')
+import { numberWithCommas } from '@/utils'
 
 export default {
   props: ["people"],
   components: {
     VueLazyImg
   },
-  methods: {
-    numeral(value) {
-      return numeral(value).format('0,0')
+  filters: {
+    numberWithCommas(value) {
+      return numberWithCommas(value)
     }
   },
   methods: {

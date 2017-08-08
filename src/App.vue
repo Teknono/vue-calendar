@@ -24,6 +24,10 @@
           <span class="icon">
             <i class="fa fa-line-chart"></i>
           </span>Charts</router-link>
+          <router-link to="/Pixabay" class="nav-item is-tab">
+          <span class="icon">
+            <i class="fa fa-picture-o"></i>
+          </span>Pixabay</router-link>
       </div>
     </nav>
     <div class="container">

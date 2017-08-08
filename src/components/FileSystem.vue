@@ -13,7 +13,7 @@
           <tr v-for="(a, index) in artists" :key="index">
             <td v-for="(prop,index) in a" :key="index">{{prop}}</td>
             <td>
-              <a class="button" @click="remove(a['.key'])">Ok</a>
+              <a class="button" @click="remove(a.name)">Ok</a>
             </td>
           </tr>
         </tbody>
@@ -25,10 +25,12 @@
 <script>
 import { db } from '@/utils/firebase'
 import orderBy from 'lodash.orderby'
+import { naturalSort } from '@/utils'
 
 export default {
   created() {
     this.onAdded()
+    this.onRemove()
   },
   firebase() {
     return {
@@ -49,6 +51,12 @@ export default {
         self.artists.push(snapshot.val())
       })
     },
+    onRemove() {
+      var self = this
+      this.$firebaseRefs.ref.on('child_removed', snapshot => {
+        this.artists = this.artists.filter(a => { return a.name !== snapshot.val().name })
+      })
+    },
     remove(child) {
       this.$firebaseRefs.ref.child(child).remove()
     },
@@ -59,7 +67,8 @@ export default {
         this.sortBy = attribute
         this.sortAsc = true
       }
-      this.artists = orderBy(this.artists,[attribute],[this.sortAsc ? 'asc' : 'desc'])
+
+      this.artists.sort((a, b) => { return naturalSort(a[attribute], b[attribute], this.sortAsc) })
 
     }
   }
@@ -67,6 +76,7 @@ export default {
 </script>
 
 <style>
+
 .is-active.asc::after {
   content: "▼"
 }

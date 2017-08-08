@@ -2,6 +2,7 @@ import Detail from '@/components/Detail'
 import FileSystem from '@/components/FileSystem'
 import FullCalendar from '@/components/FullCalendar'
 import LastFm from '@/components/LastFm'
+import Pixabay from '@/components/Pixabay'
 import Router from 'vue-router'
 import Vue from 'vue'
 import VueCharts from '@/components/Charts'
@@ -36,6 +37,11 @@ export default new Router({
       path: '/Charts',
       name: 'Charts',
       component: VueCharts
+    },
+      {
+      path: '/Pixabay',
+      name: 'Pixabay',
+      component: Pixabay
     }
   ]
 })

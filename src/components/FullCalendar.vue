@@ -53,8 +53,8 @@
 
       <div class="week" v-for="n in 6" :key="n">
         <div class="day" v-for="d in 7" :key="d" @click="openEvent">
-          <span class="tag" v-for="event in cellEvents(n,d)" :key="event.id">{{event.name}}
-            <button class="delete is-small" @click.stop="removeEvent(event.id)"></button>
+          <span class="tag is-large" v-for="event in cellEvents(n,d)" :key="event.id">{{event.name}}
+            <button class="delete is-large" @click.stop="removeEvent(event.id)"></button>
           </span>
 
         </div>
@@ -74,7 +74,7 @@ import moment from 'moment'
 import shortId from 'shortid'
 import LayoutModal from './modal/LayoutModal'
 import ContentModal from './modal/ContentModal'
-import Cell from '@/utils/Cell.js'
+import Cell from '@/models/Cell.js'
 import { mapState } from 'vuex'
 
 var locale = window.navigator.userLanguage || window.navigator.language;

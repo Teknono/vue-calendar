@@ -1,4 +1,4 @@
-import Cell from '../utils/Cell.js'
+import Cell from '@/models/Cell.js'
 import Vue from 'vue'
 import VueAxios from "vue-axios"
 import Vuex from 'vuex'
@@ -87,10 +87,7 @@ const state = {
     new Reason('ABS', 'Absence exceptionnelle payée').render(),
     new Reason('RTTE', 'RTT Employeur').render(),
     new Reason('RTTS', 'RTT Salarié').render()],
-  events: [
-    { id: shortid.generate(), date: new Date(), cell: new Cell(new Date()).render(), name: "Test" },
-    { id: shortid.generate(), date: new Date(2018, 1, 25), cell: new Cell(new Date(2018, 1, 25)).render(), name: "Necci" }
-  ]
+  events: []
 }
 
 const mutations = {

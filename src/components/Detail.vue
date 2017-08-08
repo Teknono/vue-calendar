@@ -10,7 +10,6 @@
         </li>
       </ul>
     </nav>
-
     <hr>
     <article class="media">
       <figure class="media-left">
@@ -21,11 +20,11 @@
         <p>
           <span class="icon">
             <i class="fa fa-play-circle"></i>
-          </span> {{format(artist.stats.playcount)}}</p>
+          </span> {{artist.stats.playcount | numberWithCommas}}</p>
         <p>
           <span class="icon">
             <i class="fa fa-headphones"></i>
-          </span> {{format(artist.stats.listeners)}}</p>
+          </span> {{artist.stats.listeners | numberWithCommas}}</p>
       </figure>
       <div class="media-content">
         <div class="content">
@@ -61,9 +60,9 @@ export default {
       artistRef: peopleRef
     }
   },
-  // watch: {
-  //   '$route': 'findArtist'
-  // },
+  watch: {
+    '$route': 'findArtist'
+  },
   computed: {
     onTour() {
       return {
@@ -72,14 +71,15 @@ export default {
       }
     },
     image() {
-      return this.artist.image[2]['#text']
+      return '' /*this.artist.image[2]['#text']*/
     },
   },
-  methods: {
-
-    format(value) {
+  filters: {
+    numberWithCommas(value) {
       return numberWithCommas(value)
-    },
+    }
+  },
+  methods: {
     findArtist() {
       const method = "artist.getinfo"
       const mbid = decodeURIComponent(this.$route.params.id)
@@ -87,7 +87,10 @@ export default {
       this.$http.get(apiLastFm)
         .then(response => {
           this.artist = response.data.artist
-          this.$firebaseRefs.artistRef.child(response.data.artist.name).update({ content: response.data.artist.bio.content })
+          return this.artist
+        })
+        .then(artist => {
+          this.$firebaseRefs.artistRef.child(artist.name).update({ content: artist.bio.content })
         })
         .catch(response => console.error(response))
     }

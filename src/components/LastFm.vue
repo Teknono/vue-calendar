@@ -9,7 +9,7 @@
         </p>
       </div>
     </div>
-    <loading-top :show="isLoading"></loading-top>
+
     <section class="section" v-if="networkError">
       <p>Sorry, there was an error getting artists</p>
     </section>
@@ -28,7 +28,7 @@
       </div>
       <hr>
       <transition-group name="swapi" tag="div" class="columns is-multiline is-mobile" appear>
-        <div class="column is-12-desktop is-one-third-tablet is-one-quarter-mobile" :class="{'is-one-third' : isActive}" v-for="(p, index) in paginatePeople" :key="index">
+        <div class="column is-12-desktop is-one-third-tablet is-one-quarter-mobile" :class="{'is-one-third' : isActive}" v-for="(p, index) in paginateItems" :key="index">
           <a @click="goto(index)" v-if="people[index].name">
             <box :people="p" v-if="!isActive"></box>
             <card :people="p" v-else></card>
@@ -41,17 +41,17 @@
 </template>
 
 <script>
-
-
 import box from './lastFm/Box'
 import card from './lastFm/Card'
 import pagination from './Pagination'
 import loadingTop from './lastFm/Loading'
 import router from '@/router'
 import { db, peopleRef } from '@/utils/firebase'
+import { naturalSort } from '@/utils'
+import { KEY } from '../../lastfm.key'
 
 export default {
-  mounted() {
+  created() {
     this.fetchPeople()
   },
   firebase: {
@@ -68,18 +68,14 @@ export default {
       artist: {},
       networkError: false,
       isLoading: false,
+      paginateItems: []
 
     }
   },
   computed: {
-
     attributes() {
       if (this.people.length > 0)
         return Object.keys(this.people[0])
-    },
-    paginatePeople() {
-      let peopleTemp = this.people
-      return peopleTemp.slice((this.currentPage - 1) * this.itemPerPage, this.currentPage * this.itemPerPage)
     }
   },
   components: {
@@ -87,11 +83,13 @@ export default {
   },
   methods: {
     goto(index) {
-      router.push({ name: "Detail", params: { id: this.people[index].name } })
+      router.push({ name: "Detail", params: { id: this.paginateItems[index].name } })
     },
 
     updateCurrentPage(payload) {
-      this.currentPage = payload
+      if (payload) {
+        this.paginateItems = payload.collection
+      }
     },
 
     arrowSort(attribute) {
@@ -113,29 +111,22 @@ export default {
         this.sortAsc = true
       }
 
-      this.people.sort((a, b) => {
-        if (this.sortAsc) {
-          [a, b] = [b, a]
-        }
-        if (a[attribute] < b[attribute]) {
-          return -1
-        }
-        else if (a[attribute] > b[attribute]) {
-          return 1
-        }
-        else {
-          return 0
-        }
-      })
+      this.paginateItems = this.people.sort((a, b) => { return naturalSort(a[attribute], b[attribute], this.sortAsc) }).slice(1, this.itemPerPage)
     },
 
     fetchPeople() {
       this.isLoading = true
-      const api = `http://swapi.co/api/people/`
-      const apiLastFm = 'http://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=dad46f2867c8fbc2a0bd6e78a09805af&format=json'
-      this.$http.get(apiLastFm/*'http://api.brewerydb.com/v2/?key=0670efb6e5ec64a924718a98a988b026'*/)
+      const apiLastFm = 'http://ws.audioscrobbler.com/2.0/'
+      this.$http.get(apiLastFm, {
+        params: {
+          method: 'chart.gettopartists',
+          key: KEY,
+          format: 'json'
+        }
+      })
         .then(response => {
           this.people = response.data.artists.artist;
+          this.paginateItems = this.people.slice(0, this.itemPerPage)
           this.isLoading = false
         })
         .then(() => {
@@ -162,10 +153,7 @@ export default {
 }
 
 .swapi-enter,
-.swapi-leave-to
-/* .list-leave-active for <2.1.8 */
-
-{
+.swapi-leave-to {
   opacity: 0;
   transform: translateY(30px);
 }

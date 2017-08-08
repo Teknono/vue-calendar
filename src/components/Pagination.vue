@@ -23,11 +23,17 @@ export default {
       if (this.itemPerPages && this.itemPerPages > 0)
         return Math.ceil(this.totalItems.length / this.itemPerPages)
       return 0
+    },
+    paginateCollection() {
+      let collection = this.totalItems
+      return collection.slice((this.clickPage - 1) * this.itemPerPages, this.clickPage * this.itemPerPages)
     }
   },
   watch: {
     clickPage() {
-      this.$emit("changepage", this.clickPage)
+      this.$emit("changepage", {
+        collection: this.paginateCollection
+      })
     }
   },
   methods: {
