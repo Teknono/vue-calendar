@@ -120,7 +120,7 @@ export default {
       this.$http.get(apiLastFm, {
         params: {
           method: 'chart.gettopartists',
-          key: KEY,
+          api_key: KEY,
           format: 'json'
         }
       })

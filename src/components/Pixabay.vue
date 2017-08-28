@@ -47,12 +47,12 @@
     <div class="columns is-multiline is-mobile">
       <div class="column is-one-quarter-desktop is-one-third-tablet is-half-mobile" v-for="(prop, index) in message.hits" :key="index">
         <div class="card">
-          <div class="card-image" @mouseover.stop="show = prop.id" @mouseout.stop="show = ''">
-            <figure class="image">
-              <img :src="prop.webformatURL" :height="prop.webformatHeight" :width="prop.webformatWidth" alt="">
+          <div class="card-image" @mouseover="show = prop.id" @mouseout="show = ''">
+            <figure class="image is-16by9">
+              <img src="../assets/logo.png" :height="prop.webformatHeight" :width="prop.webformatWidth" alt="" v-loaded="prop.webformatURL">
             </figure>
             <transition name="fade">
-              <nav class="level" v-if="show === prop.id">
+              <nav class="level" v-show="show === prop.id" >
                 <div class="level-left">
                   <div class="level-item">
                     <span>{{prop.user}}</span>
@@ -92,9 +92,9 @@
         </div>
       </div>
     </div>
-    <LayoutModal>
-      <ContentModal></ContentModal>
-    </LayoutModal>
+    <!-- <LayoutModal>
+              <ContentModal></ContentModal>
+            </LayoutModal>-->
   </section>
 </template>
 
@@ -104,6 +104,7 @@ import debounce from 'lodash.debounce'
 import { KEY } from '../../pixabay.key'
 import LayoutModal from './modal/LayoutModal'
 import ContentModal from './modal/ContentModal'
+require('font-awesome-webpack')
 
 export default {
   created() {
@@ -118,7 +119,20 @@ export default {
       show: false,
       historySearch: [],
       isLoading: false,
+      isLoadingImage: false,
       display: false
+    }
+  },
+  directives: {
+    loaded(el, binding) {
+      if (binding.oldValue !== binding.value) {
+        el.style.opacity = 0.2
+        el.style.transition = '0.25s'
+        el.src = binding.value
+        el.onload = () => {
+          el.style.opacity = 1
+        }
+      }
     }
   },
   methods: {
@@ -162,6 +176,10 @@ export default {
 
 <style lang="scss">
 @import "./node_modules/bulma/sass/utilities/initial-variables";
+
+/*img {
+  background: url('../assets/loading.gif') 50% no-repeat;
+}*/
 
 span.tag.is-primary {
   transition: all 1s;

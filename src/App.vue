@@ -28,6 +28,10 @@
           <span class="icon">
             <i class="fa fa-picture-o"></i>
           </span>Pixabay</router-link>
+          <router-link to="/MovieDb" class="nav-item is-tab">
+          <span class="icon">
+            <i class="fa fa-film"></i>
+          </span>MovieDb</router-link>
       </div>
     </nav>
     <div class="container">

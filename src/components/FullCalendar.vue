@@ -50,9 +50,8 @@
       <div class="header">
         <div v-for="day in days" :key="day" class=days>{{day}}</div>
       </div>
-
-      <div class="week" v-for="n in 6" :key="n">
-        <div class="day" v-for="d in 7" :key="d" @click="openEvent">
+      <div class="week" v-for="(n, i) in 6" :key="n" :id="i">
+        <div class="day" v-for="(d, j) in 7" :key="d" @click="openEvent" @mouseover.prevent.self="mouseOverHandler($event)" :id="(i*6)+(i%6)+j">
           <span class="tag is-large" v-for="event in cellEvents(n,d)" :key="event.id">{{event.name}}
             <button class="delete is-large" @click.stop="removeEvent(event.id)"></button>
           </span>
@@ -84,7 +83,13 @@ if (locale)
 export default {
   name: 'FullCalendar',
   created() {
+    document.addEventListener("mousedown", this.mouseDownHandler, false)
+    document.addEventListener("mouseup", this.mouseUpHandler, false)
     moment.locale('fr')
+  },
+  destroyed() {
+    document.removeEventListener("mousedown", this.mouseDownHandler, false)
+    document.removeEventListener("mouseup", this.mouseUpHandler, false)
   },
   mounted() {
     this.render
@@ -119,7 +124,11 @@ export default {
       weekdays: moment.weekdays(),
       isChangeMonth: false,
       holidays: new Cell(new Date()).holidays(),
-      daysInCalendar: {}
+      daysInCalendar: {},
+      isMouseDown: false,
+      selectedCell: [],
+      startRowIndex: null,
+      startCellIndex: null
     }
   },
   watch: {
@@ -167,6 +176,69 @@ export default {
     }
   },
   methods: {
+    clearSelected() {
+      document.querySelectorAll('div.day').forEach(cell => {
+        cell.style.backgroundColor = ''
+        cell.style.userSelect = ''
+      })
+    },
+    selectTo(cell) {
+      const row = cell.parentNode
+      const cellIndex = cell.id
+      const rowIndex = row.id
+
+      let rowStart, rowEnd, cellStart, cellEnd
+
+      if(rowIndex < this.startRowIndex) {
+        rowStart = rowIndex
+        rowEnd = this.startRowIndex
+      } else {
+        rowStart = this.startRowIndex
+        rowEnd = rowIndex
+      }
+
+      if(cellIndex < this.startCellIndex) {
+        cellStart = cellIndex
+        cellEnd = this.startCellIndex
+      } else {
+        cellStart = this.startCellIndex
+        cellEnd = cellIndex
+      }
+
+      for(let i = rowStart; i <= rowEnd; i++) {
+        const selector = `.week[id="${i}"]`
+        let rowCells = document.querySelector(selector).querySelectorAll('div.day')
+        console.log(rowCells)
+        for(let j = cellStart; j <= cellEnd; i++) {
+
+        }
+      }
+    },
+    mouseOverHandler(event) {
+      if (this.isMouseDown
+        && event.target.getAttribute('class')
+        && event.target.getAttribute('class').indexOf('day') >= 0) {
+        let el = event.target
+        this.selectTo(el)
+        el.style.backgroundColor = '#b3cedd'
+        el.style.userSelect = 'none'
+      }
+    },
+    mouseDownHandler(event) {
+      if (event.target.getAttribute('class')
+        && event.target.getAttribute('class').indexOf('day') >= 0) {
+        let el = event.target
+        this.clearSelected()
+        el.style.backgroundColor = '#b3cedd'
+        el.style.userSelect = 'none'
+        this.isMouseDown = true
+        this.startCellIndex = el.id
+        this.startRowIndex = el.parentNode.id
+      }
+    },
+    mouseUpHandler() {
+      this.isMouseDown = false
+    },
     cellEvents(week, day) {
       return this.events.filter(event => {
         return event.cell.day === day &&
@@ -278,7 +350,7 @@ export default {
       this.isChangeMonth = !this.isChangeMonth
     },
     openEvent(event) {
-      if(event.target.querySelector('span.calendar-number-out') !== undefined)
+      if (event.target.querySelector('span.calendar-number-out') !== undefined)
         this.$store.dispatch('toggleModal', new Date(this.year, this.month, event.target.innerText))
     },
     removeEvent(id) {
@@ -365,6 +437,10 @@ span {
         font-size: 1.2em;
         font-weight: bold;
         margin-top: 15px;
+      }
+
+      .selected {
+        background-color: $blue
       }
 
       &:hover {
