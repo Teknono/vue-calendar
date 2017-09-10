@@ -2,6 +2,7 @@ import Detail from '@/components/Detail'
 import FileSystem from '@/components/FileSystem'
 import FullCalendar from '@/components/FullCalendar'
 import LastFm from '@/components/LastFm'
+import MixProduit from '@/components/MixProduit'
 import MovieDb from '@/components/MovieDb'
 import Pixabay from '@/components/Pixabay'
 import Router from 'vue-router'
@@ -48,6 +49,11 @@ export default new Router({
       path: '/MovieDb',
       name: 'MovieDb',
       component: MovieDb
+    },
+    {
+      path: '/MixProduit',
+      name: 'MixProduit',
+      component: MixProduit
     }
   ]
 })
