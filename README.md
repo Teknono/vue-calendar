@@ -1,6 +1,6 @@
-# necci-project
+# Vue Melting Pot
 
-> A Vue.js project
+> A kind of Lab project wich contain a lot of tries with the amazing Vuejs library
 
 ## Build Setup
 
