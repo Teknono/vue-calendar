@@ -32,6 +32,10 @@
           <span class="icon">
             <i class="fa fa-film"></i>
           </span>MovieDb</router-link>
+            <router-link to="/MenuCantine" class="nav-item is-tab">
+          <span class="icon">
+            <i class="fa fa-cutlery"></i>
+          </span>Cantine</router-link>
       </div>
     </nav>
     <div class="container">

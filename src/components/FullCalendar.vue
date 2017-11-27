@@ -43,6 +43,8 @@
           </p>
         </div>
         <div class="nav-right">
+           <label class="checkbox">
+          <input type="checkbox" v-model="display">Affichage Week-End</label>
         </div>
       </nav>
     </div>
@@ -83,33 +85,13 @@ if (locale)
 export default {
   name: 'FullCalendar',
   created() {
-    document.addEventListener("mousedown", this.mouseDownHandler, false)
-    document.addEventListener("mouseup", this.mouseUpHandler, false)
     moment.locale('fr')
   },
   destroyed() {
-    document.removeEventListener("mousedown", this.mouseDownHandler, false)
-    document.removeEventListener("mouseup", this.mouseUpHandler, false)
   },
   mounted() {
     this.render
     this.customizeWeekEnd()
-
-    // document.querySelectorAll(".week .day").forEach((cell, index) => {
-    //   if (this.getFirstCell.week === Math.floor(index / 7) + 1 && this.getFirstCell.day === (index) % 7 + 1)
-    //     cell.innerHTML = "Je suis le premier jour"
-
-    //   if (this.getLastCell.week === Math.floor(index / 7) + 1 && this.getLastCell.day === (index) % 7 + 1)
-    //     cell.innerHTML = "Je suis le dernier jour"
-
-    //   if (this.getCurrentCell.week === Math.floor(index / 7) + 1 && this.getCurrentCell.day === (index) % 7 + 1) {
-    //     cell.className += " current"
-    //     cell.innerHTML = "Je suis le jour courant"
-    //   }
-
-
-    //   console.log(cell, { week: Math.floor(index / 7) + 1, day: (index) % 7 + 1 });
-    // })
   },
   components: {
     LayoutModal, ContentModal
@@ -128,7 +110,8 @@ export default {
       isMouseDown: false,
       selectedCell: [],
       startRowIndex: null,
-      startCellIndex: null
+      startCellIndex: null,
+      display: true
     }
   },
   watch: {
@@ -138,6 +121,15 @@ export default {
     },
     year() {
       this.holidays = new Cell(moment([this.year, this.month, 1])).holidays()
+    },
+    display() {
+      document.querySelectorAll(".days:nth-last-child(-n+2)").forEach(header => {
+        header.style.display = this.display ? "" : "none"
+      })
+      document.querySelectorAll(".week-end").forEach(day => {
+          day.style.display = this.display ? "" : "none"
+      
+      })
     }
   },
   computed: {
@@ -176,6 +168,7 @@ export default {
     }
   },
   methods: {
+  
     clearSelected() {
       document.querySelectorAll('div.day').forEach(cell => {
         cell.style.backgroundColor = ''
@@ -271,20 +264,18 @@ export default {
       }
     },
     clearHolidays() {
-      const el = document.querySelector("div.day span.tag")
-      if (el) {
-        el.classList.remove('tag')
-        el.classList.remove('is-primary')
-      }
+      document.querySelectorAll("div.day").forEach(day => {
+          if(day.querySelector("span.holiday"))
+            day.removeChild(day.querySelector("span.holiday"))
+      })
     },
     fillMonthHolidays() {
       this.getHolidaysInMonth.forEach(holiday => {
-        const selector = `.week:nth-child(${holiday.week + 1}) .day:nth-child(${holiday.day}) span`
+        const selector = `.week:nth-child(${holiday.week + 1}) .day:nth-child(${holiday.day})`
         const el = document.querySelector(selector)
-        el.classList.add("tag")
-        el.classList.add("is-primary")
-        el.innerHTML += " " + holiday.name
-        el.style.margin = 0
+        let span = this.createSpanElement(holiday.name, 'holiday')
+        span.classList.add("tag","is-primary") 
+        el.appendChild(span)
       })
     },
     customizeWeekEnd() {
@@ -360,7 +351,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scope>
 @import "./node_modules/bulma/sass/utilities/initial-variables";
 $calendar-color: #e0e0e0;
 $day-out: #b5b5b5;
@@ -412,6 +403,7 @@ span {
       border-style: solid;
       border-color: $calendar-color;
       border-width: 1px 1px 0 0;
+      position: relative;
 
       &:first-child {
         border-left-width: 1px;
@@ -445,6 +437,14 @@ span {
 
       &:hover {
         background-color: $grey-lighter;
+      }
+
+      .holiday {
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        position:absolute;
       }
     }
 

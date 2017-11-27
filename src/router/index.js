@@ -3,11 +3,13 @@ import FileSystem from '@/components/FileSystem'
 import FullCalendar from '@/components/FullCalendar'
 import LastFm from '@/components/LastFm'
 import MixProduit from '@/components/MixProduit'
+import MenuCantine from '@/components/MenuCantine'
 import MovieDb from '@/components/MovieDb'
 import Pixabay from '@/components/Pixabay'
 import Router from 'vue-router'
 import Vue from 'vue'
 import VueCharts from '@/components/Charts'
+
 
 Vue.use(Router)
 
@@ -54,6 +56,11 @@ export default new Router({
       path: '/MixProduit',
       name: 'MixProduit',
       component: MixProduit
+    },
+    {
+      path: '/MenuCantine',
+      name: 'MenuCantine',
+      component: MenuCantine
     }
   ]
 })
